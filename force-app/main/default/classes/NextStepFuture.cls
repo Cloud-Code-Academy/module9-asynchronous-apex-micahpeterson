@@ -17,7 +17,7 @@
  * Note: The class below contains placeholders for implementing a future method to update accounts and opportunities.
  *       The accompanying test class 'AsynchronousTest' should also be updated to test this method.
  */
-public with sharing class NextStepFuture {
+ public with sharing class NextStepFuture {
 
     /* 
      * Question 1
@@ -27,17 +27,26 @@ public with sharing class NextStepFuture {
      * Opportunity Next Step field is a standard field
      * Update the corresponding test class AsynchronousTest and test method nextStepFuture_testUpdateAllNextStep to cover test this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
-
-    /*
+    @future
+    public static void futureAccOpp() {
+    List<Opportunity> oppList = new List<Opportunity>([SELECT Id, Name, NextStep FROM Opportunity]);
+    List<Account> accList = new List<Account>([SELECT Id, Name, Next_Step__c FROM Account]);
+    
+    for (Opportunity opp : oppList) {
+        opp.NextStep = 'Meeting in the future';
+    }
+    for (Account acc : accList) {
+        acc.Next_Step__c = 'Meeting in the future';
+    }
+}
+/*
     * Question 2
     * Update/Uncomment the template code to create a method
     * Create a method that inserts a big deal opportunity and updates the user role name to 'CRO'
     * Update the corresponding test class AsynchronousTest and test method nextStepFuture_testCreateDealAndUpdateRole to cover test this method
     */
     //Mix DML Error happens when you try to perform DML operations on setup and non-setup objects in a single transaction.
+    @future
     public static void createDealAndUpdateRole() {
         Opportunity bigDeal = new Opportunity();
         insertBigDeal(bigDeal);
@@ -73,4 +82,5 @@ public with sharing class NextStepFuture {
 
         upsert role;
     }
+
 }

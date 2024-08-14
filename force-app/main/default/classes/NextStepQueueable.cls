@@ -28,31 +28,41 @@ public with sharing class NextStepQueueable {
     }
 
     // Method to queue the job
-    public static void enqueueJob() {
+    public static void enqueueJob(Map<Id,Account> accounts) {
         // Get 10 accounts with Next Step populated
-
+        List<Account> listAcc = new List<Account>([SELECT Id, Next_Step__c FROM Account WHERE Id IN :accounts.keySet() AND Next_Step__c != null LIMIT 10]);
+        
         // If there are any accounts, queue the job using System.enqueueJob
+        if(listAcc[0] != null){
+            // Enqueue the job using the System.enqueueJob method
+            System.enqueueJob(new NextStepQueueable(accounts));
+        }
     }
 
     /*
      * Update/Uncomment the template code to create a method
      * Method to execute the queueable job
      */
-    //[public | private ] [static] data_type execute (input parameters) {
+    public static void execute (Map<Id,Account> accounts) {
         // Get the accounts from the member variable
-
+        List<Account> accsToEdit = new List <Account>([SELECT Id FROM Account WHERE Id IN :accounts.keySet()]);
+        for(Account acc : accsToEdit){
             // Remove the Next Step using the helper method
-
+            removeNextStep(acc);
+        }
         // Update the accounts
-
+        update accsToEdit;
+        
         // Get the opportunities related to the accounts
-
+        List<Opportunity> listOpps = new List<Opportunity>([SELECT Id, NextStep FROM Opportunity WHERE AccountId IN :accounts.keySet()]);
+        for(Opportunity opp : listOpps){
             // Remove the Next Step using the helper method
-
+            removeNextStep(opp);
+        }
         // Update the opportunities
-
+        update listOpps;
         // Call the enqueueJob method to queue another job to process more records.
-    //}
+    }
 
     // Helper method to remove the Next Step
     // Overloaded method to accept an opportunity
